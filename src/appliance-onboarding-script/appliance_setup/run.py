@@ -159,6 +159,7 @@ if __name__ == "__main__":
         if config["isAVS"]:
             # TODO(P0): Validate Segment Exists, Segment GW IP matches required format, Segment is empty.
             # TODO(P1): Move the DNS Helper out of the processor
+
             if config["isStatic"]:
                 dns_helper = DNSHelper()
                 dns_data = dns_helper.retrieve_dns_config(_customer_details.customer_resource, _customer_details.cloud_details)

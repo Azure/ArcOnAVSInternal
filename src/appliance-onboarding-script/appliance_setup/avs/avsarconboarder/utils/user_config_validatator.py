@@ -140,7 +140,7 @@ class ConfigValidator:
         if not self.__config["staticIpNetworkDetails"]["networkForApplianceVM"].strip():
             raise InvalidInputError("Provide the value of networkForApplianceVM")
 
-        res = self._segment_helper.get_segment_list(self.__config['subscriptionId'],
+        res = self._segment_helper.get_segment_list(self.__config['subscriptionId'], 
                                                     self.__config['resourceGroup'], self.__config['privateCloud'])
         
         segment_in_config = self.__config["staticIpNetworkDetails"]["networkForApplianceVM"]
