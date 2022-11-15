@@ -23,7 +23,6 @@ class ConfigValidator:
         if gateway_ip_cidr[0] != self.__config["staticIpNetworkDetails"]["gatewayIPAddress"]:
             raise InvalidInputError("Gateway IP in config and gateway of segment do not match")
 
-
     def validate_static_ip_nw_config_v2(self):
         self._network_orchestrator.validate_static_ip_cidr_block(self.__config["staticIpNetworkDetails"]["networkCIDRForApplianceVM"], Constant.CONFIG_VERSION_V2)
  
@@ -103,7 +102,6 @@ class ConfigValidator:
             return False 
         if "gatewayIPAddress" not in self.__config["staticIpNetworkDetails"]:
             return False
-
         return True
 
     #checks if only networkForApplianceVM and networkCIDRForApplianceVM are present in config
@@ -122,7 +120,6 @@ class ConfigValidator:
             return False 
         if "gatewayIPAddress" in self.__config["staticIpNetworkDetails"]:
             return False
-
         return True
 
     def get_config_version(self):

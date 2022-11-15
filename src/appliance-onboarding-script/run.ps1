@@ -7,6 +7,7 @@ Param(
                                                                 # In case this param is true, we use az login --identity, which logs in Azure VM's identity
                                                                 # and skips the confirm prompts.
     [Parameter(Mandatory=$true)] [string] $ManagedIdentityResourceId
+
 )
 
 $majorVersion = $PSVersionTable.PSVersion.Major
