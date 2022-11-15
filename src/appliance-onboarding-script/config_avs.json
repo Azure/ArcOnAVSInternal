@@ -1,0 +1,10 @@
+{
+  "subscriptionId": "",
+  "resourceGroup": "",
+  "privateCloud": "",
+  "isStatic": true,
+  "staticIpNetworkDetails": {
+    "networkForApplianceVM": "",
+    "networkCIDRForApplianceVM": ""
+  }
+}
