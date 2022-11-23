@@ -6,8 +6,8 @@ Param(
     [Parameter(Mandatory=$false)] [bool] $isAutomated = $false, # isAutomated Parameter is set to true if it is an automation testing Run.
                                                                 # In case this param is true, we use az login --identity, which logs in Azure VM's identity
                                                                 # and skips the confirm prompts.
-    [Parameter(Mandatory=$true)] [string] $ManagedIdentityResourceId
-
+    [Parameter(Mandatory=$true)] [string] $ManagedIdentityResourceId,
+    [Parameter(Mandatory=$false)] [string] $storageAccountName = 'None'
 )
 
 $majorVersion = $PSVersionTable.PSVersion.Major
@@ -217,8 +217,19 @@ foreach($x in $AzExtensions.GetEnumerator())
 
 py .\appliance_setup\run.py $Operation $FilePath $LogLevel $isAutomated
 $OperationExitCode = $LASTEXITCODE
-
+Write-Host $OperationExitCode
 printOperationStatusMessage -Operation $Operation -OperationExitCode $OperationExitCode
+
+if($Operation -eq "onboard" -And $storageAccountName -ne "None")
+{
+    #TODO: split the case for fail in arc appliance deploy and other
+    if($OperationExitCode -ne 0)
+    {
+        $getArcApplianceLogs = $true
+        py .\appliance_setup\run.py "collect-logs" $FilePath $LogLevel $isAutomated $storageAccountName $getArcApplianceLogs
+        py .\appliance_setup\run.py "offboard" $FilePath $LogLevel $isAutomated
+    }
+}
 
 deactivate_venv
 

@@ -1,3 +1,4 @@
+import os
 
 SEGMENT_NAME="arc-segment"
 DHCP_NAME = "arc-dhcp"
@@ -33,3 +34,4 @@ DNS_SERVICE_IP = "DNS_Service_IP"
 CONFIG_VERSION_V1 = 0
 CONFIG_VERSION_V2 = 1
 VALID_LOCATIONS = "westeurope,eastus,australiaeast,canadacentral,uksouth,southeastasia"
+ROOT_DIR = os.path.dirname(os.path.abspath(__file__))

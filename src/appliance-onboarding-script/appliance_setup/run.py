@@ -20,6 +20,8 @@ from avs.avsarconboarder.creator.arcaddon.arc_addon_creator import ArcAddonCreat
 from avs.avsarconboarder.deleter.arcadon.arc_addon_deleter import ArcAddonDeleter
 from pkgs._utils import confirm_prompt
 from avs.avsarconboarder.retriever.arcaddon.arc_add_on_retriever import ArcAddOnRetriever
+from avs.avsarconboarder.logger._collect_logs import CollectLogs
+from avs.avsarconboarder.logger._upload_logs import UploadLogs
 
 def logger_setup(logLevel = logging.INFO):
     log_formatter = logging.Formatter('%(asctime)s %(name)-12s %(levelname)-8s %(message)s')
@@ -83,10 +85,10 @@ if __name__ == "__main__":
         operation = sys.argv[1]
     except IndexError:
         raise InvalidOperation(
-            'Operation is not passed as argument. Supported versions are \"onboard\" and \"offboard\"')
+            'Operation is not passed as argument. Supported versions are \"onboard\", \"offboard\" and \"collect-logs\"')
 
-    if operation not in ['onboard', 'offboard']:
-        raise InvalidOperation('Supported versions are \"onboard\" and \"offboard\" ')
+    if operation not in ['onboard', 'offboard','collect-logs']:
+        raise InvalidOperation('Supported versions are \"onboard\" , \"offboard\" and \"collect-logs\"')
 
     file_path = None
     try:
@@ -109,6 +111,18 @@ if __name__ == "__main__":
                                                       # and skip the confirm prompts.
     except IndexError:
         isAutomated = False;
+
+    try:
+        storageAccountName = (sys.argv[5]) 
+
+    except IndexError:
+        storageAccountName = None
+
+    try:
+        getArcApplianceLogs = (sys.argv[6].lower() == 'true') # get the arc-appliance logs along with onboarding logs if
+                                                      # getFullLogs is set to True
+    except IndexError:
+        getArcApplianceLogs = False
     
     log_level_dict = {
         "DEBUG": logging.DEBUG,
@@ -182,5 +196,19 @@ if __name__ == "__main__":
         arc_vmware_res = ArcVMwareResources(config)
         appliance_setup = ApplianceSetup(config, arc_vmware_res, isAutomated)
         appliance_setup.delete()
+    elif operation == 'collect-logs': 
+        if storageAccountName == None:
+            raise InvalidInputError("storageAccount needs to be provided to collect and upload logs.")
+        log_timestamp = datetime.timestamp(datetime.now())
+        logs_dir = os.path.join(Constant.ROOT_DIR,'src/appliance-onboarding-script/storagelogs{}'.format(log_timestamp))
+        print(logs_dir)
+        collectLogs = CollectLogs(logs_dir, config)
+        collectLogs.fetch_onboardinglogs()
+        if getArcApplianceLogs:
+            collectLogs.fetch_arc_appliance_logs()    
+    
+        uploadLogs = UploadLogs(storageAccountName)
+        container_name = 'scriptlogs'
+        uploadLogs.upload_folder_to_storage(logs_dir, container_name)
     else:
         raise InvalidOperation(f"Invalid operation entered - {operation}")
