@@ -12,8 +12,8 @@ class UploadLogs:
 
     def container_exists(self, container_name):
         res, err = az_cli('storage', 'container', 'exists', 
-                        '--account-name', self.storage_account,
-                        '--name', container_name,
+                        '--account-name', f'"{self.storage_account}"',
+                        '--name', f'"{container_name}"',
                         '--auth-mode','login')
         if err:
             raise AzCommandError('failed to get container details')
@@ -24,8 +24,8 @@ class UploadLogs:
     
     def create_container(self, container_name):
         res, err = az_cli('storage', 'container', 'create', 
-                        '--name', container_name,
-                        '--account-name', self.storage_account,
+                        '--name', f'"{container_name}"',
+                        '--account-name', f'"{self.storage_account}"',
                         '--public-access', 'blob',
                         '--auth-mode','login')
         if err:
@@ -38,10 +38,10 @@ class UploadLogs:
         path = pathlib.PurePath(logs_folder)
 
         res, err = az_cli('storage', 'blob', 'upload-batch', 
-                        '--destination', container_name,
-                        '--account-name', self.storage_account,
-                        '--source', logs_folder,
-                        '--destination-path', path.name,
+                        '--destination', f'"{container_name}"',
+                        '--account-name', f'"{self.storage_account}"',
+                        '--source', f'"{logs_folder}"',
+                        '--destination-path', f'"{path.name}"',
                         '--auth-mode','login')
         if err:
             raise AzCommandError('failed to upload to container')

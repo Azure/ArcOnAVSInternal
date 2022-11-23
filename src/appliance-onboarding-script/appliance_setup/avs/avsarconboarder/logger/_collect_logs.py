@@ -4,6 +4,7 @@ import shutil
 
 from pkgs._az_cli import az_cli
 from pkgs._exceptions import AzCommandError
+from pkgs._utils import safe_escape_characters
 
 class CollectLogs:
 
@@ -32,10 +33,10 @@ class CollectLogs:
         vcenter_username = self.__config['vCenterUserName']
         vcenter_password = self.__config['vCenterPassword']
         res, err = az_cli('arcappliance', 'logs', 'vmware', 
-                        '--ip', arc_appliance_ip,
-                        '--address', vcenter_ip,
-                        '--username', vcenter_username,
-                        '--password', vcenter_password)
+                        '--ip', f'"{arc_appliance_ip}"',
+                        '--address', f'"{vcenter_ip}"',
+                        '--username',f'"{vcenter_username}"',
+                        '--password="{}"'.format(safe_escape_characters(vcenter_password)))
         if err:
             raise AzCommandError('error in fetching arc appliance logs fetched')
         logging.info("arc appliance logs fetched")
