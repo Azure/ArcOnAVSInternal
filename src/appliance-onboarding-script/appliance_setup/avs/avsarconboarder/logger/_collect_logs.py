@@ -1,6 +1,7 @@
 import logging
 import os
 import shutil 
+import glob
 
 from pkgs._az_cli import az_cli
 from pkgs._exceptions import AzCommandError
@@ -17,11 +18,12 @@ class CollectLogs:
     def fetch_onboardinglogs(self):
         try:
             shutil.copy('config_avs.json', self.logs_folder)
-            shutil.copytree('logs', self.logs_folder)
+            shutil.copytree('logs', self.logs_folder + '/logs')
             shutil.copy('.temp/vmware-appliance.yaml', self.logs_folder)
             shutil.copy('.temp/vmware-infra.yaml', self.logs_folder)
             shutil.copy('.temp/vmware-resource.yaml', self.logs_folder)
             shutil.copy('.temp/kubeconfig', self.logs_folder)
+            shutil.copy('output.txt', self.logs_folder)
             shutil.copy(os.path.join(self.kva_log_dir, 'kva.log'), self.logs_folder)
         
         except Exception as e:
@@ -38,8 +40,12 @@ class CollectLogs:
                         '--username',f'"{vcenter_username}"',
                         '--password="{}"'.format(safe_escape_characters(vcenter_password)))
         if err:
-            raise AzCommandError('error in fetching arc appliance logs fetched')
-        logging.info("arc appliance logs fetched")
+            logging.info("failed to fetch arc appliance logs")
+        else:
+            logging.info("arc appliance logs fetched")
 
-        arc_appl_log_file = open(self.logs_folder + '/arc_appl_log_file.txt', 'w')
-        arc_appl_log_file.write(res)
+        try:
+            files = glob.glob("appliance-logs*")
+            shutil.copytree(files[-1], self.logs_folder + '/arc-appliance-logs')
+        except:
+            logging.info('appliance-logs folder not found')

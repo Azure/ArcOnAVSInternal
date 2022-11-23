@@ -44,5 +44,5 @@ class UploadLogs:
                         '--destination-path', f'"{path.name}"',
                         '--auth-mode','login')
         if err:
-            raise AzCommandError('failed to upload to container')
+            raise AzCommandError('failed to upload files to container')
         logging.info("uploaded files to container")
