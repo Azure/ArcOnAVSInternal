@@ -169,7 +169,7 @@ if __name__ == "__main__":
             arc_add_on_details =  arc_add_on_retriever.retrieve_data(_customer_details.customer_resource)
             if arc_add_on_details:
                 raise InvalidInputError("Cannot Onboard. SDDC is already Arc Onboarded")
-            
+        
         if config["isAVS"]:
             # TODO(P0): Validate Segment Exists, Segment GW IP matches required format, Segment is empty.
             # TODO(P1): Move the DNS Helper out of the processor
@@ -200,15 +200,15 @@ if __name__ == "__main__":
         if storageAccountName == None:
             raise InvalidInputError("storageAccount needs to be provided to collect and upload logs.")
         log_timestamp = datetime.timestamp(datetime.now())
-        logs_dir = os.path.join(Constant.ROOT_DIR,'src/appliance-onboarding-script/storagelogs{}'.format(log_timestamp))
-        print(logs_dir)
-        collectLogs = CollectLogs(logs_dir, config)
+        logs_folder = 'storagelogs{}'.format(log_timestamp)
+       
+        collectLogs = CollectLogs(logs_folder, config)
         collectLogs.fetch_onboardinglogs()
         if getArcApplianceLogs:
             collectLogs.fetch_arc_appliance_logs()    
     
         uploadLogs = UploadLogs(storageAccountName)
         container_name = 'scriptlogs'
-        uploadLogs.upload_folder_to_storage(logs_dir, container_name)
+        uploadLogs.upload_folder_to_storage(logs_folder, container_name)
     else:
         raise InvalidOperation(f"Invalid operation entered - {operation}")

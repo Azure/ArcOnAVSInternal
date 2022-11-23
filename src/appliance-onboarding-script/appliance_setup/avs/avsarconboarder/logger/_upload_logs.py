@@ -1,5 +1,6 @@
 import logging
 import pathlib
+import json
 
 from pkgs._exceptions import AzCommandError
 from pkgs._az_cli import az_cli
@@ -17,7 +18,9 @@ class UploadLogs:
         if err:
             raise AzCommandError('failed to get container details')
         logging.info("container details fetched")
-        return res["exists"]
+
+        container_details = json.loads(res)
+        return container_details["exists"]
     
     def create_container(self, container_name):
         res, err = az_cli('storage', 'container', 'create', 
@@ -30,7 +33,7 @@ class UploadLogs:
         logging.info("container created")
 
     def upload_folder_to_storage(self, logs_folder, container_name):  
-        if(self.container_exists(container_name) == "false"):
+        if(not self.container_exists(container_name)):
             self.create_container(container_name)
         path = pathlib.PurePath(logs_folder)
 
@@ -39,7 +42,6 @@ class UploadLogs:
                         '--account-name', self.storage_account,
                         '--source', logs_folder,
                         '--destination-path', path.name,
-                        '--public-access', 'blob',
                         '--auth-mode','login')
         if err:
             raise AzCommandError('failed to upload to container')
