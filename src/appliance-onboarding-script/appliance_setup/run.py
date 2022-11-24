@@ -201,14 +201,22 @@ if __name__ == "__main__":
             raise InvalidInputError("storageAccount needs to be provided to collect and upload logs.")
         log_timestamp = datetime.timestamp(datetime.now())
         logs_folder = 'storagelogs{}'.format(log_timestamp)
-       
-        collectLogs = CollectLogs(logs_folder, config)
-        collectLogs.fetch_onboardinglogs()
-        if getArcApplianceLogs:
-            collectLogs.fetch_arc_appliance_logs()    
-    
-        uploadLogs = UploadLogs(storageAccountName)
-        container_name = 'scriptlogs'
-        uploadLogs.upload_folder_to_storage(logs_folder, container_name)
+        
+        try:
+            collectLogs = CollectLogs(logs_folder, config)
+            collectLogs.fetch_onboardinglogs()
+            if getArcApplianceLogs:
+                collectLogs.fetch_arc_appliance_logs()   
+
+        except Exception:
+            logging.error('Failed to capture logs')
+
+        try:
+            uploadLogs = UploadLogs(storageAccountName)
+            container_name = 'scriptlogs'
+            uploadLogs.upload_folder_to_storage(logs_folder, container_name)
+        except Exception:
+            logging.error('Failed to upload logs')
+
     else:
         raise InvalidOperation(f"Invalid operation entered - {operation}")

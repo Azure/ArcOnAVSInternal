@@ -4,7 +4,7 @@ import shutil
 import glob
 
 from pkgs._az_cli import az_cli
-from pkgs._exceptions import AzCommandError
+from pkgs._exceptions import AzCommandError, FilePathNotFound
 from pkgs._utils import safe_escape_characters
 
 class CollectLogs:
@@ -27,7 +27,7 @@ class CollectLogs:
             shutil.copy(os.path.join(self.kva_log_dir, 'kva.log'), self.logs_folder)
         
         except Exception as e:
-            logging.error("Insufficient logs captured: {}".format(e))
+            raise FilePathNotFound('logs folder not found: {}') from e
     
     def fetch_arc_appliance_logs(self):
         arc_appliance_ip = self.__config["applianceControlPlaneIpAddress"]
@@ -39,11 +39,13 @@ class CollectLogs:
                         '--address', f'"{vcenter_ip}"',
                         '--username',f'"{vcenter_username}"',
                         '--password="{}"'.format(safe_escape_characters(vcenter_password)))
-        if not err:
+        if err:
             logging.info("arc appliance logs fetched")
+        else:
+            raise AzCommandError('Failed to fetch arc appliance logs')
 
         try:
             files = glob.glob("appliance-logs*")
             shutil.copytree(files[-1], self.logs_folder + '/arc-appliance-logs')
-        except:
-            logging.error('appliance-logs folder not found')
+        except Exception as e:
+            raise FilePathNotFound('arc appliance logs folder not found') from e
