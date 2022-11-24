@@ -23,11 +23,11 @@ class CollectLogs:
             shutil.copy('.temp/vmware-infra.yaml', self.logs_folder)
             shutil.copy('.temp/vmware-resource.yaml', self.logs_folder)
             shutil.copy('.temp/kubeconfig', self.logs_folder)
-            shutil.copy('output.txt', self.logs_folder)
+            shutil.copy('console_output.txt', self.logs_folder)
             shutil.copy(os.path.join(self.kva_log_dir, 'kva.log'), self.logs_folder)
         
         except Exception as e:
-            logging.info("Insufficient logs captured")
+            logging.error("Insufficient logs captured: {}".format(e))
     
     def fetch_arc_appliance_logs(self):
         arc_appliance_ip = self.__config["applianceControlPlaneIpAddress"]
@@ -39,13 +39,11 @@ class CollectLogs:
                         '--address', f'"{vcenter_ip}"',
                         '--username',f'"{vcenter_username}"',
                         '--password="{}"'.format(safe_escape_characters(vcenter_password)))
-        if err:
-            logging.info("failed to fetch arc appliance logs")
-        else:
+        if not err:
             logging.info("arc appliance logs fetched")
 
         try:
             files = glob.glob("appliance-logs*")
             shutil.copytree(files[-1], self.logs_folder + '/arc-appliance-logs')
         except:
-            logging.info('appliance-logs folder not found')
+            logging.error('appliance-logs folder not found')

@@ -14,10 +14,9 @@ class UploadLogs:
         res, err = az_cli('storage', 'container', 'exists', 
                         '--account-name', f'"{self.storage_account}"',
                         '--name', f'"{container_name}"',
-                        '--auth-mode','login')
+                        '--auth-mode','key')
         if err:
             raise AzCommandError('failed to get container details')
-        logging.info("container details fetched")
 
         container_details = json.loads(res)
         return container_details["exists"]
@@ -27,10 +26,9 @@ class UploadLogs:
                         '--name', f'"{container_name}"',
                         '--account-name', f'"{self.storage_account}"',
                         '--public-access', 'blob',
-                        '--auth-mode','login')
+                        '--auth-mode','key')
         if err:
             raise AzCommandError('failed to create container')
-        logging.info("container created")
 
     def upload_folder_to_storage(self, logs_folder, container_name):  
         if(not self.container_exists(container_name)):
@@ -42,7 +40,7 @@ class UploadLogs:
                         '--account-name', f'"{self.storage_account}"',
                         '--source', f'"{logs_folder}"',
                         '--destination-path', f'"{path.name}"',
-                        '--auth-mode','login')
+                        '--auth-mode','key')
         if err:
             raise AzCommandError('failed to upload files to container')
         logging.info("uploaded files to container")
