@@ -27,7 +27,7 @@ class CollectLogs:
             shutil.copy(os.path.join(self.kva_log_dir, 'kva.log'), self.logs_folder)
         
         except Exception as e:
-            raise FilePathNotFound('logs folder not found: {}') from e
+            logging.info(e)
     
     def fetch_arc_appliance_logs(self):
         arc_appliance_ip = self.__config["applianceControlPlaneIpAddress"]

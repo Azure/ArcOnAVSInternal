@@ -209,7 +209,7 @@ if __name__ == "__main__":
                 collectLogs.fetch_arc_appliance_logs()   
 
         except Exception:
-            logging.error('Failed to capture logs')
+            logging.error('Failed to capture complete logs')
 
         try:
             uploadLogs = UploadLogs(storageAccountName)
