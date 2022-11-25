@@ -40,12 +40,10 @@ class CollectLogs:
                         '--username',f'"{vcenter_username}"',
                         '--password="{}"'.format(safe_escape_characters(vcenter_password)))
         if err:
-            logging.info("arc appliance logs fetched")
+            logging.error("failed to fetch arc appliance logs")
         else:
-            raise AzCommandError('Failed to fetch arc appliance logs')
-
-        try:
-            files = glob.glob("appliance-logs*")
-            shutil.copytree(files[-1], self.logs_folder + '/arc-appliance-logs')
-        except Exception as e:
-            raise FilePathNotFound('arc appliance logs folder not found') from e
+            try:
+                files = glob.glob("appliance-logs*")
+                shutil.copytree(files[-1], self.logs_folder + '/arc-appliance-logs')
+            except Exception as e:
+                logging.error('arc appliance logs folder not found')
