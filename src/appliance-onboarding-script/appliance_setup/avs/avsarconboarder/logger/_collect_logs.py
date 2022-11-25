@@ -46,4 +46,4 @@ class CollectLogs:
                 files = glob.glob("appliance-logs*")
                 shutil.copytree(files[-1], self.logs_folder + '/arc-appliance-logs')
             except Exception as e:
-                logging.error('arc appliance logs folder not found')
+                logging.error(e)

@@ -208,15 +208,15 @@ if __name__ == "__main__":
             if getArcApplianceLogs:
                 collectLogs.fetch_arc_appliance_logs()   
 
-        except Exception:
-            logging.error('Failed to capture complete logs')
+        except Exception as e:
+            logging.error('Failed to capture complete logs. Inner exception is {}'.format(e))
 
         try:
             uploadLogs = UploadLogs(storageAccountName)
             container_name = 'scriptlogs'
             uploadLogs.upload_folder_to_storage(logs_folder, container_name)
-        except Exception:
-            logging.error('Failed to upload logs')
+        except Exception as e:
+            logging.error('Failed to upload logs. Inner exception is {}'.format(e))
 
     else:
         raise InvalidOperation(f"Invalid operation entered - {operation}")
