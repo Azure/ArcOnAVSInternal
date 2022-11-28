@@ -114,23 +114,23 @@ if __name__ == "__main__":
         except IndexError:
             isAutomated = False;
 
-    try:
-        storageAccountName = sys.argv[5]
+        try:
+            storageAccountName = sys.argv[5]
 
-    except IndexError:
-        storageAccountName = None
+        except IndexError:
+            storageAccountName = None
 
-    try:
-        getArcApplianceLogs = (sys.argv[6].lower() == 'true') # get the arc-appliance logs along with onboarding logs if
-                                                      # getFullLogs is set to True
-    except IndexError:
-        getArcApplianceLogs = False
+        try:
+            getArcApplianceLogs = (sys.argv[6].lower() == 'true') # get the arc-appliance logs along with onboarding logs if
+                                                        # getFullLogs is set to True
+        except IndexError:
+            getArcApplianceLogs = False
 
-    try:
-        managedIdentityResourceId = sys.argv[7]
-    
-    except IndexError:
-        managedIdentityResourceId = None
+        try:
+            managedIdentityResourceId = sys.argv[7]
+        
+        except IndexError:
+            managedIdentityResourceId = None
         
         log_level_dict = {
             "DEBUG": logging.DEBUG,
@@ -229,6 +229,7 @@ if __name__ == "__main__":
 
         else:
             raise InvalidOperation(f"Invalid operation entered - {operation}")
+
     except CustomBaseException as cbe:
         traceback.print_exc()
         logging.error(f"\nException occurred:{cbe.msg}")
