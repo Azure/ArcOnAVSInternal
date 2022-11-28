@@ -1,7 +1,7 @@
 import json
 import logging
 import os
-import sys
+import sys, traceback
 from datetime import datetime
 from avs._avs_orchestrator import AVSOrchestrator
 from avs.avsarconboarder.orchestrator.network._network_orchestrator import NetworkOrchestrator
@@ -22,6 +22,7 @@ from pkgs._utils import confirm_prompt
 from avs.avsarconboarder.retriever.arcaddon.arc_add_on_retriever import ArcAddOnRetriever
 from avs.avsarconboarder.logger._collect_logs import CollectLogs
 from avs.avsarconboarder.logger._upload_logs import UploadLogs
+from common_exceptions import CustomBaseException, ExitCodes
 
 def logger_setup(logLevel = logging.INFO):
     log_formatter = logging.Formatter('%(asctime)s %(name)-12s %(levelname)-8s %(message)s')
@@ -82,35 +83,36 @@ def _populate_default_values_of_optional_fields_in_config(config):
 
 if __name__ == "__main__":
     try:
-        operation = sys.argv[1]
-    except IndexError:
-        raise InvalidOperation(
-            'Operation is not passed as argument. Supported versions are \"onboard\", \"offboard\" and \"collect-logs\"')
+        try:
+            operation = sys.argv[1]
+        except IndexError:
+            raise InvalidOperation(
+                'Operation is not passed as argument. Supported versions are \"onboard\" and \"offboard\"')
 
-    if operation not in ['onboard', 'offboard','collect-logs']:
-        raise InvalidOperation('Supported versions are \"onboard\" , \"offboard\" and \"collect-logs\"')
+        if operation not in ['onboard', 'offboard','collect-logs']:
+            raise InvalidOperation('Supported versions are \"onboard\" , \"offboard\" and \"collect-logs\"')
 
-    file_path = None
-    try:
-        file_path = sys.argv[2]
-    except IndexError:
-        raise FilePathNotFoundInArgs('Config file path is not given in command line arguments.')
-    config = None
-    with open(file_path, 'r') as f:
-        data = f.read()
-        config = json.loads(data)
+        file_path = None
+        try:
+            file_path = sys.argv[2]
+        except IndexError:
+            raise FilePathNotFoundInArgs('Config file path is not given in command line arguments.')
+        config = None
+        with open(file_path, 'r') as f:
+            data = f.read()
+            config = json.loads(data)
 
-    try:
-        log_level = sys.argv[3]
-    except IndexError:
-        log_level = "INFO"
+        try:
+            log_level = sys.argv[3]
+        except IndexError:
+            log_level = "INFO"
 
-    try:
-        isAutomated = (sys.argv[4].lower() == 'true') # isAutomated Parameter is set to true if it is an automation testing Run. 
-                                                      # In case this param is true, we use az login --identity, which logs in Azure VM's identity
-                                                      # and skip the confirm prompts.
-    except IndexError:
-        isAutomated = False;
+        try:
+            isAutomated = (sys.argv[4].lower() == 'true') # isAutomated Parameter is set to true if it is an automation testing Run. 
+                                                        # In case this param is true, we use az login --identity, which logs in Azure VM's identity
+                                                        # and skip the confirm prompts.
+        except IndexError:
+            isAutomated = False;
 
     try:
         storageAccountName = sys.argv[5]
@@ -129,100 +131,104 @@ if __name__ == "__main__":
     
     except IndexError:
         managedIdentityResourceId = None
-    
-    log_level_dict = {
-        "DEBUG": logging.DEBUG,
-        "INFO": logging.INFO,
-        "WARNING": logging.WARNING,
-        "ERROR": logging.ERROR,
-        "CRITICAL": logging.CRITICAL,
-    }
-
-    if log_level not in log_level_dict.keys():
-        raise InvalidOperation('Entered log level {} is not supported. Supported loglevels are {}'.format(log_level, log_level_dict.keys()))
-
-    logger_setup(log_level_dict[log_level])
-
-    _populate_default_values_of_optional_fields_in_config(config)
-
-    if config["isAVS"]:
-        logging.info("avs enabled")
-        avs_config_validator = ConfigValidator(config)
-        avs_config_validator.validate_avs_config()
-
-        version = avs_config_validator.get_config_version()      
-        if(version == Constant.CONFIG_VERSION_V2):
-            network_orchestrator: Orchestrator = NetworkOrchestrator()
-            network_orchestrator.orchestrate(config)
-
-        avs_orchestrator: Orchestrator = AVSOrchestrator()
-        _customer_details = avs_orchestrator.orchestrate(config)
-
-        # TODO: Remove the Condition check after internal testing.
-        #  This condition allows the user specified location to be use for creating RB, CL resources.
-        #  If not sepecified the private cloud's location is used. This is the expected behavior.
-        #  The former is enabled only to speed up internal testing
-        if Constant.LOCATION not in config:
-            config[Constant.LOCATION] = _customer_details.cloud_details[Constant.LOCATION]
-
-        # TODO: Point to documentation link here for getting valid regions.
-        if not validate_region(config[Constant.LOCATION]):
-            raise InvalidRegion(f"This feature is only available in these regions: {Constant.VALID_LOCATIONS}")
-
-    if operation == 'onboard':
-        if config["register"]:
-            arc_add_on_retriever: ArcAddOnRetriever = ArcAddOnRetriever()
-            arc_add_on_details =  arc_add_on_retriever.retrieve_data(_customer_details.customer_resource)
-            if arc_add_on_details:
-                raise InvalidInputError("Cannot Onboard. SDDC is already Arc Onboarded")
         
+        log_level_dict = {
+            "DEBUG": logging.DEBUG,
+            "INFO": logging.INFO,
+            "WARNING": logging.WARNING,
+            "ERROR": logging.ERROR,
+            "CRITICAL": logging.CRITICAL,
+        }
+
+        if log_level not in log_level_dict.keys():
+            raise InvalidOperation('Entered log level {} is not supported. Supported loglevels are {}'.format(log_level, log_level_dict.keys()))
+
+        logger_setup(log_level_dict[log_level])
+
+        _populate_default_values_of_optional_fields_in_config(config)
+
         if config["isAVS"]:
-            # TODO(P0): Validate Segment Exists, Segment GW IP matches required format, Segment is empty.
-            # TODO(P1): Move the DNS Helper out of the processor
+            logging.info("avs enabled")
+            avs_config_validator = ConfigValidator(config)
+            avs_config_validator.validate_avs_config()
 
-            if config["isStatic"]:
-                dns_helper = DNSHelper()
-                dns_data = dns_helper.retrieve_dns_config(_customer_details.customer_resource, _customer_details.cloud_details)
-                config[Constant.DNS_SERVICE_IP] = [dns_data.server_details['properties']['dnsServiceIp']]
-        arc_vmware_res = ArcVMwareResources(config)
-        appliance_setup = ApplianceSetup(config, arc_vmware_res, isAutomated)
+            version = avs_config_validator.get_config_version()      
+            if(version == Constant.CONFIG_VERSION_V2):
+                network_orchestrator: Orchestrator = NetworkOrchestrator()
+                network_orchestrator.orchestrate(config)
 
-        env_setup = VMwareEnvSetup(config)
-        env_setup.setup()
+            avs_orchestrator: Orchestrator = AVSOrchestrator()
+            _customer_details = avs_orchestrator.orchestrate(config)
 
-        vcenterId = appliance_setup.create()
-        if config["isAVS"] and config["register"]:
-            register_with_private_cloud(_customer_details.customer_resource, vcenterId)
-    elif operation == 'offboard':
-        # Removing confirm_prompts for automated testing
-        if (isAutomated == False) and not confirm_prompt('Do you want to proceed with offboard operation?'):
-            raise ProgramExit('User chose to exit the program.')
-        if config["isAVS"] and config["register"]:
-            deregister_from_private_cloud(_customer_details.customer_resource)
-        arc_vmware_res = ArcVMwareResources(config)
-        appliance_setup = ApplianceSetup(config, arc_vmware_res, isAutomated)
-        appliance_setup.delete()
-    elif operation == 'collect-logs': 
-        if storageAccountName == None:
-            raise InvalidInputError("storageAccount needs to be provided to collect and upload logs.")
-        log_timestamp = datetime.timestamp(datetime.now())
-        logs_folder = 'storagelogs{}'.format(log_timestamp)
-        
-        try:
-            collectLogs = CollectLogs(logs_folder, config)
-            collectLogs.fetch_onboardinglogs()
-            if getArcApplianceLogs:
-                collectLogs.fetch_arc_appliance_logs()   
+            # TODO: Remove the Condition check after internal testing.
+            #  This condition allows the user specified location to be use for creating RB, CL resources.
+            #  If not sepecified the private cloud's location is used. This is the expected behavior.
+            #  The former is enabled only to speed up internal testing
+            if Constant.LOCATION not in config:
+                config[Constant.LOCATION] = _customer_details.cloud_details[Constant.LOCATION]
 
-        except Exception as e:
-            logging.error('Failed to capture complete logs. Inner exception is {}'.format(e))
+            # TODO: Point to documentation link here for getting valid regions.
+            if not validate_region(config[Constant.LOCATION]):
+                raise InvalidRegion(f"This feature is only available in these regions: {Constant.VALID_LOCATIONS}")
 
-        try:
-            uploadLogs = UploadLogs(storageAccountName, config, managedIdentityResourceId)
-            container_name = 'scriptlogs'
-            uploadLogs.upload_folder_to_storage(logs_folder, container_name)
-        except Exception as e:
-            logging.error('Failed to upload logs. Inner exception is {}'.format(e))
+        if operation == 'onboard':
+            if config["register"]:
+                arc_add_on_retriever: ArcAddOnRetriever = ArcAddOnRetriever()
+                arc_add_on_details =  arc_add_on_retriever.retrieve_data(_customer_details.customer_resource)
+                if arc_add_on_details:
+                    raise InvalidInputError("Cannot Onboard. SDDC is already Arc Onboarded")
+            
+            if config["isAVS"]:
+                # TODO(P0): Validate Segment Exists, Segment GW IP matches required format, Segment is empty.
+                # TODO(P1): Move the DNS Helper out of the processor
 
-    else:
-        raise InvalidOperation(f"Invalid operation entered - {operation}")
+                if config["isStatic"]:
+                    dns_helper = DNSHelper()
+                    dns_data = dns_helper.retrieve_dns_config(_customer_details.customer_resource, _customer_details.cloud_details)
+                    config[Constant.DNS_SERVICE_IP] = [dns_data.server_details['properties']['dnsServiceIp']]
+            arc_vmware_res = ArcVMwareResources(config)
+            appliance_setup = ApplianceSetup(config, arc_vmware_res, isAutomated)
+
+            env_setup = VMwareEnvSetup(config)
+            env_setup.setup()
+
+            vcenterId = appliance_setup.create()
+            if config["isAVS"] and config["register"]:
+                register_with_private_cloud(_customer_details.customer_resource, vcenterId)
+        elif operation == 'offboard':
+            # Removing confirm_prompts for automated testing
+            if (isAutomated == False) and not confirm_prompt('Do you want to proceed with offboard operation?'):
+                raise ProgramExit('User chose to exit the program.')
+            if config["isAVS"] and config["register"]:
+                deregister_from_private_cloud(_customer_details.customer_resource)
+            arc_vmware_res = ArcVMwareResources(config)
+            appliance_setup = ApplianceSetup(config, arc_vmware_res, isAutomated)
+            appliance_setup.delete()
+        elif operation == 'collect-logs': 
+            if storageAccountName == None:
+                raise InvalidInputError("storageAccount needs to be provided to collect and upload logs.")
+            log_timestamp = datetime.timestamp(datetime.now())
+            logs_folder = 'storagelogs{}'.format(log_timestamp)
+            
+            
+            try:
+                collectLogs = CollectLogs(logs_folder, config)
+                collectLogs.fetch_onboardinglogs()
+                if getArcApplianceLogs:
+                    collectLogs.fetch_arc_appliance_logs()   
+
+            except Exception as e:
+                logging.error('Failed to capture complete logs. Inner exception is {}'.format(e))
+
+            try:
+                uploadLogs = UploadLogs(storageAccountName, config, managedIdentityResourceId)
+                container_name = 'scriptlogs'
+                uploadLogs.upload_folder_to_storage(logs_folder, container_name)
+            except Exception as e:
+                logging.error('Failed to upload logs. Inner exception is {}'.format(e))
+
+        else:
+            raise InvalidOperation(f"Invalid operation entered - {operation}")
+    except CustomBaseException as cbe:
+        traceback.print_exc()
+        sys.exit(cbe.returnExitCode())

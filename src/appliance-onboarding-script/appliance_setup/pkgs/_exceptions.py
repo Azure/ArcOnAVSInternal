@@ -1,32 +1,101 @@
 #!/usr/bin/python
 
 # These are the exceptions used across different modules.
+from common_exceptions import CustomBaseException, ExitCodes
 
-class FilePathNotFoundInArgs(Exception): pass
+class FilePathNotFoundInArgs(CustomBaseException): 
+    def returnExitCode(self):
+        return ExitCodes.CONFIG_NOT_FOUND
 
-class InvalidConfigError(Exception): pass
+class AzCommandError(CustomBaseException): 
+    def returnExitCode(self):
+        exit_code = ExitCodes.GENERIC_ERROR
+        arc_validate_failure_err = 'arcappliance Validate command failed. Fix the configuration and try again.'
+        arc_prepare_failure_err = 'arcappliance prepare command failed.'
+        arc_deploy_failure_err = 'arcappliance deploy command failed.'
+        arc_create_failure_err = 'arcappliance create command failed.'
+        arc_delete_failure_err = 'arcappliance delete command failed.'
+        k8s_extn_create_failure_err = 'Create k8s-extension instance failed.'
+        k8s_extn_delete_failure_err = 'Delete k8s-extension instance failed.'
+        cl_create_failure_err = 'Create Custom Location failed.'
+        cl_delete_failure_err = 'Delete Custom Location failed.'
+        create_vCenter_err = 'Connect vCenter failed.'
+        delete_vCenter_err = 'Delete vCenter failed.'
 
-class AzCommandError(Exception): pass
+        if(self.msg.casefold() == arc_validate_failure_err.casefold()):
+            return ExitCodes.ARC_APPLIANCE_VALIDATE_FAILURE        
+        if(self.msg.casefold() == arc_prepare_failure_err.casefold()):
+            return ExitCodes.ARC_APPLIANCE_PREPARE_FAILURE        
+        if(self.msg.casefold() == arc_deploy_failure_err.casefold()):
+            return ExitCodes.ARC_APPLIANCE_DEPLOY_FAILURE  
+              
+        if(self.msg.casefold() == arc_create_failure_err.casefold()):
+            return ExitCodes.ARC_APPLIANCE_CREATE_FAILURE
+        if(self.msg.casefold().contains(k8s_extn_create_failure_err.casefold())):
+            return ExitCodes.K8s_EXTN_CREATE_FAILURE
+        if(self.msg.casefold() == cl_create_failure_err.casefold()):
+            return ExitCodes.CL_CREATE_FAILURE      
+        if(self.msg.casefold() == create_vCenter_err.casefold()):
+            return ExitCodes.VCENTER_CREATE_FAILURE                
 
-class InvalidOperation(Exception): pass
+        if(self.msg.casefold() == arc_delete_failure_err.casefold()):
+            return ExitCodes.ARC_APPLIANCE_DELETE_FAILURE
+        if(self.msg.casefold().contains(k8s_extn_delete_failure_err.casefold())):
+            return ExitCodes.K8s_EXTN_DELETE_FAILURE
+        if(self.msg.casefold() == cl_delete_failure_err.casefold()):
+            return ExitCodes.CL_DELETE_FAILURE
+        if(self.msg.casefold() == delete_vCenter_err.casefold()):
+            return ExitCodes.VCENTER_DELETE_FAILURE
+                        
+        return exit_code
 
-class ProgramExit(Exception): pass
+class InvalidOperation(CustomBaseException): 
+    def returnExitCode(self):
+        return ExitCodes.INCORRECT_INPUT
 
-class vCenterOperationFailed(Exception): pass
+class ProgramExit(CustomBaseException): 
+    def returnExitCode(self):
+        return ExitCodes.GENERIC_ERROR
 
-class InvalidInputError(Exception): pass
+class vCenterOperationFailed(CustomBaseException): 
+    def returnExitCode(self):
+        return ExitCodes.VCENTER_ENV_FAILURE
 
-class OperationTimedoutError(Exception): pass
+class InvalidInputError(CustomBaseException):  
+    def returnExitCode(self):
+        exit_code = ExitCodes.INCORRECT_INPUT
+        already_onboarded_sddc_err_str = "Cannot Onboard. SDDC is already Arc Onboarded" 
 
-class InvalidState(Exception): pass
+        if(self.msg.casefold() == already_onboarded_sddc_err_str.casefold):
+            return ExitCodes.SDDC_ALREADY_ONBOARDED
+        
+        if(self.msg.contains("Invalid config") | self.msg.contains("is a required configuration")):
+            return ExitCodes.CONFIG_VALIDATION_FAILED
+        return exit_code
 
-class ArmFeatureNotRegistered(Exception): pass
+#TODO: (Remove this comment) Should we have a separate error for timeout?
+# Should we have a filter here to check for the error msg?
+class OperationTimedoutError(CustomBaseException):  
+    def returnExitCode(self):
+        return ExitCodes.ARC_APPLIANCE_CREATE_FAILURE 
 
+class ArmFeatureNotRegistered(CustomBaseException):  
+    def returnExitCode(self):
+        return ExitCodes.FEATURE_NOT_REGISTERED
 
-class ClusterExtensionCreationFailed(Exception): pass
+class ClusterExtensionCreationFailed(CustomBaseException):  
+    def returnExitCode(self):
+        return ExitCodes.CL_CREATE_FAILURE
 
-class ArmProviderNotRegistered(Exception): pass
+class ArmProviderNotRegistered(CustomBaseException):  
+    def returnExitCode(self):
+        return ExitCodes.RP_NOT_REGISTERED
 
-class InvalidRegion(Exception): pass
+class InvalidRegion(CustomBaseException):  
+    def returnExitCode(self):
+        return ExitCodes.INVALID_REGION
 
-class InternetNotEnabled(Exception): pass
+#TODO: Is this being used?
+class InternetNotEnabled(CustomBaseException):  
+    def returnExitCode(self):
+        return ExitCodes.INTERNET_NOT_ENABLED
