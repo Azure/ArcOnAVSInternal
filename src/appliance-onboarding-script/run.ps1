@@ -218,6 +218,9 @@ foreach($x in $AzExtensions.GetEnumerator())
 py .\appliance_setup\run.py $Operation $FilePath $LogLevel $isAutomated
 $OperationExitCode = $LASTEXITCODE
 
+#TODO : Remove this post testing
+Write-Host "The LASTEXITCODE is $LASTEXITCODE"
+
 printOperationStatusMessage -Operation $Operation -OperationExitCode $OperationExitCode
 
 if($Operation -eq "onboard" -And $storageAccountName -ne "None")
