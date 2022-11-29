@@ -85,7 +85,7 @@ class ArmFeatureNotRegistered(CustomBaseException):
 
 class ClusterExtensionCreationFailed(CustomBaseException):  
     def returnExitCode(self):
-        return ExitCodes.CL_CREATE_FAILURE
+        return ExitCodes.K8s_EXTN_CREATE_FAILURE
 
 class ArmProviderNotRegistered(CustomBaseException):  
     def returnExitCode(self):
