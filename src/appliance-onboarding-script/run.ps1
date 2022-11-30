@@ -219,7 +219,7 @@ py .\appliance_setup\run.py $Operation $FilePath $LogLevel $isAutomated
 $OperationExitCode = $LASTEXITCODE
 
 #TODO : Remove this post testing
-Write-Host "The LASTEXITCODE is $LASTEXITCODE"
+Write-Host "The LASTEXITCODE is $OperationExitCode"
 
 printOperationStatusMessage -Operation $Operation -OperationExitCode $OperationExitCode
 
