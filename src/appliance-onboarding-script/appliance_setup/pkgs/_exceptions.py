@@ -66,7 +66,7 @@ class InvalidInputError(CustomBaseException):
         exit_code = ExitCodes.INCORRECT_INPUT.value
         already_onboarded_sddc_err_str = "Cannot Onboard. SDDC is already Arc Onboarded" 
 
-        if(self.msg.casefold() == already_onboarded_sddc_err_str.casefold):
+        if(self.msg.casefold() == already_onboarded_sddc_err_str.casefold()):
             return ExitCodes.SDDC_ALREADY_ONBOARDED.value
         
         if(self.msg.__contains__("Invalid config") | self.msg.__contains__("is a required configuration")):

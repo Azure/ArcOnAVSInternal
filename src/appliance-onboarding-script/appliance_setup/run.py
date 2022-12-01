@@ -231,5 +231,5 @@ if __name__ == "__main__":
             raise InvalidOperation(f"Invalid operation entered - {operation}")
     except CustomBaseException as cbe:
         traceback.print_exc()
-        logging.error(f"Exception occurred:{cbe.msg}")
+        logging.error(f"\nException occurred:{cbe.msg}")
         sys.exit(cbe.returnExitCode())
