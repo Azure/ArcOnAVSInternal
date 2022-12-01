@@ -2,6 +2,9 @@ from enum import Enum
 from abc import ABC, abstractmethod
 
 class CustomBaseException(Exception) :
+    def __init__(self, msg =""):
+        self.msg = msg
+        super().__init__(self.msg)
     @abstractmethod
     def returnExitCode(self):
         pass
