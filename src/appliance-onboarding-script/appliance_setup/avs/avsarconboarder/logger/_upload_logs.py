@@ -4,11 +4,28 @@ import json
 
 from pkgs._exceptions import AzCommandError
 from pkgs._az_cli import az_cli
+from ..constants import Constant
  
 class UploadLogs:
 
-    def __init__(self, storage_account):
+    def __init__(self, storage_account, config, managed_identity_id):
         self.storage_account = storage_account
+        self.__config = config
+        self._storage_account_uri = Constant.STORAGE_ACCOUNT_URI
+        self.create_storage_blob_contributor_assignment(managed_identity_id)
+
+    def create_storage_blob_contributor_assignment(self, managed_identity_id):
+        storage_account_uri = self._storage_account_uri.format(self.__config["subscriptionId"], 
+                                                               self.__config["resourceGroup"],
+                                                               self.storage_account)
+       
+        res, err = az_cli('role', 'assignment', 'create', 
+                        '--assignee', f'"{managed_identity_id}"',
+                        '--role', 'Storage Blob Data Contributor',
+                        '--scope', f'"{storage_account_uri}"')
+
+        if err:
+            logging.error('failed to create Storage Blob Data Contributor role assignment')
 
     def container_exists(self, container_name):
         res, err = az_cli('storage', 'container', 'exists', 

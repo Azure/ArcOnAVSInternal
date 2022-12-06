@@ -17,6 +17,7 @@ PRIVATE_CLOUD_URL = "/subscriptions/{0}/resourceGroups/{1}/providers/Microsoft.A
 MGMT_URL = "https://management.azure.com/subscriptions/{0}/resourceGroups/{1}/providers/Microsoft.AVS/privateClouds/{2}/"
 NSX_MGMT_URL = MGMT_URL+"workloadNetworks/default"
 NSX_SUBSCRIPTION_URI = "/subscriptions/{0}/resourceGroups/{1}/providers/Microsoft.AVS/privateClouds/{2}/workloadNetworks/default"
+STORAGE_ACCOUNT_URI = "/subscriptions/{0}/resourceGroups/{1}/Microsoft.Storage/storageAccounts/{2}"
 SERVER = "SERVER"
 INTERNET = "internet"
 LOCATION = "location"

@@ -226,7 +226,7 @@ if($Operation -eq "onboard" -And $storageAccountName -ne "None")
     if($OperationExitCode -ne 0)
     {
         $getArcApplianceLogs = $true
-        py .\appliance_setup\run.py "collect-logs" $FilePath $LogLevel $isAutomated $storageAccountName $getArcApplianceLogs
+        py .\appliance_setup\run.py "collect-logs" $FilePath $LogLevel $isAutomated $storageAccountName $getArcApplianceLogs $ManagedIdentityResourceId
         py .\appliance_setup\run.py "offboard" $FilePath $LogLevel $isAutomated
     }
 }

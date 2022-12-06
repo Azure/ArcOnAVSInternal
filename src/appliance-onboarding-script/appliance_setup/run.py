@@ -113,7 +113,7 @@ if __name__ == "__main__":
         isAutomated = False;
 
     try:
-        storageAccountName = (sys.argv[5]) 
+        storageAccountName = sys.argv[5]
 
     except IndexError:
         storageAccountName = None
@@ -123,6 +123,12 @@ if __name__ == "__main__":
                                                       # getFullLogs is set to True
     except IndexError:
         getArcApplianceLogs = False
+
+    try:
+        managedIdentityResourceId = sys.argv[7]
+    
+    except IndexError:
+        managedIdentityResourceId = None
     
     log_level_dict = {
         "DEBUG": logging.DEBUG,
@@ -212,7 +218,7 @@ if __name__ == "__main__":
             logging.error('Failed to capture complete logs. Inner exception is {}'.format(e))
 
         try:
-            uploadLogs = UploadLogs(storageAccountName)
+            uploadLogs = UploadLogs(storageAccountName, config, managedIdentityResourceId)
             container_name = 'scriptlogs'
             uploadLogs.upload_folder_to_storage(logs_folder, container_name)
         except Exception as e:
