@@ -34,15 +34,11 @@ class VNETIPCIDRNotFound(CustomBaseException):
 
 class InvalidInputError(CustomBaseException):
     def returnExitCode(self):
-        exit_code = ExitCodes.INCORRECT_INPUT.value
-        already_onboarded_sddc_err_str = "Cannot Onboard. SDDC is already Arc Onboarded" 
+        return ExitCodes.INCORRECT_INPUT.value
 
-        if(self.msg.casefold() == already_onboarded_sddc_err_str.casefold()):
-            return ExitCodes.SDDC_ALREADY_ONBOARDED.value
-        
-        if(self.msg.__contains__("Invalid config") | self.msg.__contains__("is a required configuration")):
-            return ExitCodes.CONFIG_VALIDATION_FAILED.value
-        return exit_code
+class ConfigValidationError(InvalidInputError):
+    def returnExitCode(self):
+        return ExitCodes.CONFIG_VALIDATION_FAILED.value
 
 class DataNotFoundException(CustomBaseException):
     def returnExitCode(self):

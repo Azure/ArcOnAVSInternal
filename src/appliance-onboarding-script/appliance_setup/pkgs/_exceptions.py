@@ -9,45 +9,51 @@ class FilePathNotFoundInArgs(CustomBaseException):
 
 class AzCommandError(CustomBaseException): 
     def returnExitCode(self):
-        exit_code = ExitCodes.GENERIC_ERROR.value
-        arc_validate_failure_err = 'arcappliance Validate command failed. Fix the configuration and try again.'
-        arc_prepare_failure_err = 'arcappliance prepare command failed.'
-        arc_deploy_failure_err = 'arcappliance deploy command failed.'
-        arc_create_failure_err = 'arcappliance create command failed.'
-        arc_delete_failure_err = 'arcappliance delete command failed.'
-        k8s_extn_create_failure_err = 'Create k8s-extension instance failed.'
-        k8s_extn_delete_failure_err = 'Delete k8s-extension instance failed.'
-        cl_create_failure_err = 'Create Custom Location failed.'
-        cl_delete_failure_err = 'Delete Custom Location failed.'
-        create_vCenter_err = 'Connect vCenter failed.'
-        delete_vCenter_err = 'Delete vCenter failed.'
+        return ExitCodes.GENERIC_ERROR.value
+        
+class AzArcApplianceValidateError(AzCommandError) :
+    def returnExitCode(self):
+        return ExitCodes.ARC_APPLIANCE_VALIDATE_FAILURE.value
 
-        if(self.msg.casefold() == arc_validate_failure_err.casefold()):
-            return ExitCodes.ARC_APPLIANCE_VALIDATE_FAILURE.value        
-        if(self.msg.casefold() == arc_prepare_failure_err.casefold()):
-            return ExitCodes.ARC_APPLIANCE_PREPARE_FAILURE.value        
-        if(self.msg.casefold() == arc_deploy_failure_err.casefold()):
-            return ExitCodes.ARC_APPLIANCE_DEPLOY_FAILURE.value 
-              
-        if(self.msg.casefold() == arc_create_failure_err.casefold()):
-            return ExitCodes.ARC_APPLIANCE_CREATE_FAILURE.value
-        if(self.msg.casefold().__contains__(k8s_extn_create_failure_err.casefold())):
-            return ExitCodes.K8s_EXTN_CREATE_FAILURE.value
-        if(self.msg.casefold() == cl_create_failure_err.casefold()):
-            return ExitCodes.CL_CREATE_FAILURE.value    
-        if(self.msg.casefold() == create_vCenter_err.casefold()):
-            return ExitCodes.VCENTER_CREATE_FAILURE.value                
+class AzArcAppliancePrepareError(AzCommandError):
+    def returnExitCode(self):
+        return ExitCodes.ARC_APPLIANCE_PREPARE_FAILURE.value
 
-        if(self.msg.casefold() == arc_delete_failure_err.casefold()):
-            return ExitCodes.ARC_APPLIANCE_DELETE_FAILURE.value
-        if(self.msg.casefold().__contains__(k8s_extn_delete_failure_err.casefold())):
-            return ExitCodes.K8s_EXTN_DELETE_FAILURE.value
-        if(self.msg.casefold() == cl_delete_failure_err.casefold()):
-            return ExitCodes.CL_DELETE_FAILURE.value
-        if(self.msg.casefold() == delete_vCenter_err.casefold()):
-            return ExitCodes.VCENTER_DELETE_FAILURE.value
-                        
-        return exit_code
+class AzArcApplianceDeployError(AzCommandError):
+    def returnExitCode(self):
+        return ExitCodes.ARC_APPLIANCE_DEPLOY_FAILURE.value
+
+class AzArcApplianceCreateError(AzCommandError):
+    def returnExitCode(self):
+        return ExitCodes.ARC_APPLIANCE_CREATE_FAILURE.value
+
+class AzArcApplianceDeleteError(AzCommandError):
+    def returnExitCode(self):
+        return ExitCodes.ARC_APPLIANCE_DELETE_FAILURE.value
+
+class K8sExtnCreateError(AzCommandError):
+    def returnExitCode(self):
+        return ExitCodes.K8s_EXTN_CREATE_FAILURE.value
+
+class K8sExtnDeleteError(AzCommandError):
+    def returnExitCode(self):
+        return ExitCodes.K8s_EXTN_DELETE_FAILURE.value
+
+class CLCreateError(AzCommandError):
+    def returnExitCode(self):
+        return ExitCodes.CL_CREATE_FAILURE.value  
+
+class CLDeleteError(AzCommandError):
+    def returnExitCode(self):
+        return ExitCodes.CL_DELETE_FAILURE.value  
+
+class VCenterCreatError(AzCommandError):
+    def returnExitCode(self):
+        return ExitCodes.VCENTER_CREATE_FAILURE.value
+
+class VCenterDeleteError(AzCommandError):
+    def returnExitCode(self):
+        return ExitCodes.VCENTER_DELETE_FAILURE.value
 
 class InvalidOperation(CustomBaseException): 
     def returnExitCode(self):
@@ -63,15 +69,11 @@ class vCenterOperationFailed(CustomBaseException):
 
 class InvalidInputError(CustomBaseException):  
     def returnExitCode(self):
-        exit_code = ExitCodes.INCORRECT_INPUT.value
-        already_onboarded_sddc_err_str = "Cannot Onboard. SDDC is already Arc Onboarded" 
+        return ExitCodes.INCORRECT_INPUT.value
 
-        if(self.msg.casefold() == already_onboarded_sddc_err_str.casefold()):
-            return ExitCodes.SDDC_ALREADY_ONBOARDED.value
-        
-        if(self.msg.__contains__("Invalid config") | self.msg.__contains__("is a required configuration")):
-            return ExitCodes.CONFIG_VALIDATION_FAILED.value
-        return exit_code
+class SDDCOnboardedError(InvalidInputError):
+    def returnExitCode(self):
+        return ExitCodes.SDDC_ALREADY_ONBOARDED.value
 
 #TODO: (Remove this comment) Should we have a separate error for timeout?
 # Should we have a filter here to check for the error msg?

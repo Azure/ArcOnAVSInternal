@@ -14,7 +14,7 @@ from avs.avsarconboarder.utils.utils import validate_region
 from avs.converter._converter import Converter
 from avs.converter.nsx.nsx_converter import DHCPConverter, SegmentConverter
 from pkgs import ApplianceSetup, VMwareEnvSetup, ArcVMwareResources
-from pkgs._exceptions import FilePathNotFoundInArgs, InvalidOperation, InternetNotEnabled, InvalidRegion, ProgramExit, InvalidInputError
+from pkgs._exceptions import FilePathNotFoundInArgs, InvalidOperation, InternetNotEnabled, InvalidRegion, ProgramExit, InvalidInputError, SDDCOnboardedError
 from avs.avsarconboarder.entity.request.arc_addon_request import ArcAddonRequest
 from avs.avsarconboarder.creator.arcaddon.arc_addon_creator import ArcAddonCreator
 from avs.avsarconboarder.deleter.arcadon.arc_addon_deleter import ArcAddonDeleter
@@ -176,8 +176,8 @@ if __name__ == "__main__":
                 arc_add_on_retriever: ArcAddOnRetriever = ArcAddOnRetriever()
                 arc_add_on_details =  arc_add_on_retriever.retrieve_data(_customer_details.customer_resource)
                 if arc_add_on_details:
-                    raise InvalidInputError("Cannot Onboard. SDDC is already Arc Onboarded")
-            
+                    raise SDDCOnboardedError("Cannot Onboard. SDDC is already Arc Onboarded")
+                
             if config["isAVS"]:
                 # TODO(P0): Validate Segment Exists, Segment GW IP matches required format, Segment is empty.
                 # TODO(P1): Move the DNS Helper out of the processor
