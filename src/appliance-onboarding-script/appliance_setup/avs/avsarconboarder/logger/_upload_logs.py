@@ -18,10 +18,10 @@ class UploadLogs:
         storage_account_uri = self._storage_account_uri.format(self.__config["subscriptionId"], 
                                                                self.__config["resourceGroup"],
                                                                self.storage_account)
-       
+
         res, err = az_cli('role', 'assignment', 'create', 
                         '--assignee', f'"{managed_identity_id}"',
-                        '--role', 'Storage Blob Data Contributor',
+                        '--role', f'"Storage Blob Data Contributor"',
                         '--scope', f'"{storage_account_uri}"')
 
         if err:
