@@ -47,7 +47,7 @@ class CLDeleteError(AzCommandError):
     def returnExitCode(self):
         return ExitCodes.CL_DELETE_FAILURE.value  
 
-class VCenterCreatError(AzCommandError):
+class VCenterCreateError(AzCommandError):
     def returnExitCode(self):
         return ExitCodes.VCENTER_CREATE_FAILURE.value
 
