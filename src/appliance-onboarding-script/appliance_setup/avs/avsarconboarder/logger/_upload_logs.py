@@ -26,7 +26,7 @@ class UploadLogs:
                         '--scope', f'"{storage_account_uri}"')
 
         if err:
-            logging.error('failed to create Storage Blob Data Contributor role assignment')
+            raise AzCommandError('failed to create Storage Blob Data Contributor role assignment')
 
     def container_exists(self, container_name):
         res, err = az_cli('storage', 'container', 'exists', 
