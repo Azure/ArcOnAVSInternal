@@ -50,7 +50,7 @@ class AlreadyExistsException(CustomBaseException):
 
 class CreationException(CustomBaseException):
     def returnExitCode(self):
-        return ExitCodes.GENERIC_ERROR.value
+        return ExitCodes.CREATION_ERROR.value
 
 class DHCPCreationException(CreationException):
     def returnExitCode(self):
@@ -74,7 +74,7 @@ class ArcAddOnCreationException(CreationException):
 
 class DeletionException(CustomBaseException):
     def returnExitCode(self):
-        return ExitCodes.GENERIC_ERROR.value
+        return ExitCodes.DELETION_ERROR.value
 
 class ArcAddOnDeletionException(DeletionException):
     def returnExitCode(self):

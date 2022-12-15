@@ -9,7 +9,7 @@ class FilePathNotFoundInArgs(CustomBaseException):
 
 class AzCommandError(CustomBaseException): 
     def returnExitCode(self):
-        return ExitCodes.GENERIC_ERROR.value
+        return ExitCodes.AZ_CMD_ERROR.value
         
 class AzArcApplianceValidateError(AzCommandError) :
     def returnExitCode(self):
