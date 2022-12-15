@@ -22,6 +22,7 @@ class InvalidState(Exception): pass
 
 class ArmFeatureNotRegistered(Exception): pass
 
+
 class ClusterExtensionCreationFailed(Exception): pass
 
 class ArmProviderNotRegistered(Exception): pass
@@ -29,5 +30,3 @@ class ArmProviderNotRegistered(Exception): pass
 class InvalidRegion(Exception): pass
 
 class InternetNotEnabled(Exception): pass
-
-class FilePathNotFound(Exception): pass

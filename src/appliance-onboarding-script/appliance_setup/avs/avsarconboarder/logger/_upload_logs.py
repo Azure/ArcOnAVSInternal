@@ -20,7 +20,8 @@ class UploadLogs:
                                                                self.storage_account)
 
         res, err = az_cli('role', 'assignment', 'create', 
-                        '--assignee', f'"{managed_identity_id}"',
+                        '--assignee-object-id', f'"{managed_identity_id}"',
+                        '--assignee-principal-type','ServicePrincipal',
                         '--role', f'"Storage Blob Data Contributor"',
                         '--scope', f'"{storage_account_uri}"')
 
