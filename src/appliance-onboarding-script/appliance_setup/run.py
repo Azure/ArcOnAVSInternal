@@ -87,7 +87,7 @@ if __name__ == "__main__":
             operation = sys.argv[1]
         except IndexError:
             raise InvalidOperation(
-                'Operation is not passed as argument. Supported versions are \"onboard\" and \"offboard\"')
+                'Operation is not passed as argument. Supported versions are \"onboard\", \"offboard\" and \"collect-logs\""')
 
         if operation not in ['onboard', 'offboard','collect-logs']:
             raise InvalidOperation('Supported versions are \"onboard\" , \"offboard\" and \"collect-logs\"')
