@@ -3,8 +3,7 @@ from xmlrpc.client import Boolean
 from tokenize import String
 from pathlib import Path
 import logging
-from ._exceptions import AzCommandError, InvalidOperation, ProgramExit, ArmFeatureNotRegistered, \
-    ClusterExtensionCreationFailed, ArmProviderNotRegistered
+from ._exceptions import *
 from ._az_cli import az_cli
 from ._azure_resource_validations import _wait_until_appliance_is_in_running_state
 from ._utils import TempChangeDir, confirm_prompt, decode_base64, delete_empty_sub_dicts, delete_unassigned_fields, \
@@ -186,7 +185,7 @@ class ApplianceSetup(object):
                               '--config-file', 'vmware-appliance.yaml')
 
             if err:
-                raise AzCommandError('arcappliance Validate command failed. Fix the configuration and try again.')
+                raise AzArcApplianceValidateError('arcappliance Validate command failed. Fix the configuration and try again.')
             logging.info("arcappliance validate command succeeded")
 
     def _prepare_appliance(self):
@@ -197,7 +196,7 @@ class ApplianceSetup(object):
             res, err = az_cli('arcappliance', 'prepare', 'vmware',
                               '--config-file', 'vmware-appliance.yaml')
             if err:
-                raise AzCommandError('arcappliance prepare command failed.')
+                raise AzArcAppliancePrepareError('arcappliance prepare command failed.')
 
             logging.info("arcappliance prepare command succeeded")
 
@@ -220,7 +219,7 @@ class ApplianceSetup(object):
                     # Removing confirm_prompts for automated testing
                     # Considering if deploy command fails, we fail the automation
                     if self._isAutomated or not confirm_prompt('Deployment failed. Still want to proceed?'):
-                        raise AzCommandError('arcappliance deploy command failed.')
+                        raise AzArcApplianceDeployError('arcappliance deploy command failed.')
                 logging.info("arcappliance deploy command succeeded")
                 try:
                     copy('kubeconfig', '../')
@@ -234,7 +233,7 @@ class ApplianceSetup(object):
                               '--config-file', 'vmware-appliance.yaml',
                               '--kubeconfig', 'kubeconfig')
             if err:
-                raise AzCommandError('arcappliance create command failed.')
+                raise AzArcApplianceCreateError('arcappliance create command failed.')
             logging.info("Successfully provisioned arcappliance arm resource.")
 
             # Adding explicit get call to work around ongoing issue where
@@ -261,7 +260,7 @@ class ApplianceSetup(object):
             res, err = az_cli('arcappliance', 'delete', 'vmware', '-y',
                               '--config-file', 'vmware-appliance.yaml')
             if err:
-                raise AzCommandError('arcappliance delete command failed.')
+                raise AzArcApplianceDeleteError('arcappliance delete command failed.')
             logging.info("arcappliance delete command succeeded")
 
     def _create_or_delete_vmware_extension(self, op='create') -> str:
@@ -303,7 +302,7 @@ class ApplianceSetup(object):
                               '--config', 'Microsoft.CustomLocation.ServiceAccount=azure-vmwareoperator'
                               )
             if err:
-                raise AzCommandError(f'Create k8s-extension instance failed.')
+                raise K8sExtnCreateError(f'Create k8s-extension instance failed.')
 
             # Adding explicit get call to work around ongoing issue where
             # Az CLI put calls do not return the complete resource payload
@@ -329,7 +328,7 @@ class ApplianceSetup(object):
                             '--cluster-type', 'appliances',
                             )
             if err:
-                raise AzCommandError(f'Delete k8s-extension instance failed.')
+                raise K8sExtnDeleteError(f'Delete k8s-extension instance failed.')
             logging.info("Delete k8s-extension instance command succeeded")
 
     def _create_template_files(self):

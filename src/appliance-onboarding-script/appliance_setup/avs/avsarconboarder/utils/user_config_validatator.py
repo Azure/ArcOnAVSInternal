@@ -1,7 +1,7 @@
 from operator import truediv
 from avs.avsarconboarder.entity.CustomerResource import CustomerResource
 from avs.avsarconboarder.orchestrator.network._network_orchestrator import NetworkOrchestrator
-from avs.avsarconboarder.exception import InvalidInputError
+from avs.avsarconboarder.exception import InvalidInputError, ConfigValidationError
 from avs.avsarconboarder.retriever.cloud_data.cloud_data_retriever import CloudDataRetriever
 from avs.avsarconboarder.constants import Constant
 from ..processor.nsx.helper import _NSXSegmentHelper
@@ -35,15 +35,15 @@ class ConfigValidator:
 
     def validate_dhcp_nw_config(self):
         if "DHCPNetworkDetails" not in self.__config:
-            raise InvalidInputError("DHCPNetworkDetails is a required configuration")
+            raise ConfigValidationError("DHCPNetworkDetails is a required configuration")
         if "networkForApplianceVM" not in self.__config["DHCPNetworkDetails"]:
-            raise InvalidInputError("DHCPNetworkDetails.networkForApplianceVM is a required configuration")
+            raise ConfigValidationError("DHCPNetworkDetails.networkForApplianceVM is a required configuration")
         if "networkCIDRForApplianceVM" not in self.__config["DHCPNetworkDetails"]:
-            raise InvalidInputError("DHCPNetworkDetails.networkCIDRForApplianceVM is a required configuration")
+            raise ConfigValidationError("DHCPNetworkDetails.networkCIDRForApplianceVM is a required configuration")
         if "segmentDHCPRangeForApplianceVM" not in self.__config["DHCPNetworkDetails"]:
-            raise InvalidInputError("DHCPNetworkDetails.segmentDHCPRangeForApplianceVM is a required configuration")
+            raise ConfigValidationError("DHCPNetworkDetails.segmentDHCPRangeForApplianceVM is a required configuration")
         if "DHCPServerCIDR" not in self.__config["DHCPNetworkDetails"]:
-            raise InvalidInputError("DHCPNetworkDetails.DHCPServerCIDR is a required configuration")
+            raise ConfigValidationError("DHCPNetworkDetails.DHCPServerCIDR is a required configuration")
 
     def validate_nw_config(self):
 
@@ -68,16 +68,16 @@ class ConfigValidator:
         try:
             cloud_data_retriever.retrieve_data(customer_res)
         except Exception as e:
-            raise InvalidInputError(f"Invalid config, the subscriptionId, resourceGroup, privateCloud values do not "
+            raise ConfigValidationError(f"Invalid config, the subscriptionId, resourceGroup, privateCloud values do not "
                                     f"point to a valid privateCloud resource. The inner exception is {e}")
 
     def validate_azure_details(self):
         if "subscriptionId" not in self.__config:
-            raise InvalidInputError("subscriptionId is a required configuration")
+            raise ConfigValidationError("subscriptionId is a required configuration")
         if "resourceGroup" not in self.__config:
-            raise InvalidInputError("resourceGroup is a required configuration")
+            raise ConfigValidationError("resourceGroup is a required configuration")
         if "privateCloud" not in self.__config:
-            raise InvalidInputError("privateCloud is a required configuration")
+            raise ConfigValidationError("privateCloud is a required configuration")
         self.validate_private_cloud()
 
     def block_DHCP_config(self):

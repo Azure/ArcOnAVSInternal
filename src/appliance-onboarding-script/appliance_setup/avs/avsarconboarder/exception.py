@@ -1,98 +1,81 @@
-class UnknownPathException(Exception):
-    pass
+from common_exceptions import CustomBaseException, ExitCodes
 
+class InvalidDataException(CustomBaseException):
+    def returnExitCode(self):
+        return ExitCodes.GENERIC_ERROR.value
 
-class ValidationFailedException(Exception):
-    pass
+class ValidationFailedException(CustomBaseException):
+    def returnExitCode(self):
+        return ExitCodes.GENERIC_ERROR.value
 
+class UnexpectedRetrievalException(CustomBaseException):
+    def returnExitCode(self):
+        return ExitCodes.GENERIC_ERROR.value
 
-class InvalidDataException(Exception):
-    pass
+class VCSADetailsNotFoundException(CustomBaseException):
+    def returnExitCode(self):
+        return ExitCodes.FETCH_SDDC_DETAILS_ERROR.value
 
+class InternetEnabledFlagNotFound(CustomBaseException):
+    def returnExitCode(self):
+        return ExitCodes.INTERNET_NOT_ENABLED.value
 
-class ValidationFailedException(Exception):
-    pass
+class ManagementClusterNotFound(CustomBaseException):
+    def returnExitCode(self):
+        return ExitCodes.FETCH_SDDC_DETAILS_ERROR.value
 
+class UnexpectedCreatorException(CustomBaseException):
+    def returnExitCode(self):
+        return ExitCodes.GENERIC_ERROR.value
 
-class UnexpectedRetrievalException(Exception):
-    pass
+class VNETIPCIDRNotFound(CustomBaseException):
+    def returnExitCode(self):
+        return ExitCodes.FETCH_SDDC_DETAILS_ERROR.value
 
+class InvalidInputError(CustomBaseException):
+    def returnExitCode(self):
+        return ExitCodes.INCORRECT_INPUT.value
 
-class VCSADetailsNotFoundException(Exception):
-    pass
+class ConfigValidationError(InvalidInputError):
+    def returnExitCode(self):
+        return ExitCodes.CONFIG_VALIDATION_FAILED.value
 
+class DataNotFoundException(CustomBaseException):
+    def returnExitCode(self):
+        return ExitCodes.FETCH_SDDC_DETAILS_ERROR.value
 
-class InternetEnabledFlagNotFound(Exception):
-    pass
+class AlreadyExistsException(CustomBaseException):
+    def returnExitCode(self):
+        return ExitCodes.GENERIC_ERROR.value
 
-
-class CustomerDetailsNotFound(Exception):
-    pass
-
-
-class ManagementClusterNotFound(Exception):
-    pass
-
-
-class UnExpectedError(Exception):
-    pass
-
-
-class UnexpectedCreatorException(Exception):
-    pass
-
-
-class SegmentDHCPRangeError(Exception):
-    pass
-
-
-class VNETIPCIDRNotFound(Exception):
-    pass
-
-
-class InvalidInputError(Exception):
-    pass
-
-
-class DataNotFoundException(Exception):
-    pass
-
-
-class AlreadyExistsException(Exception):
-    pass
-
-
-class PortsAlreadyOccupiedInSegmentException(Exception):
-    pass
-
-
-class CreationException(Exception):
-    pass
-
+class CreationException(CustomBaseException):
+    def returnExitCode(self):
+        return ExitCodes.CREATION_ERROR.value
 
 class DHCPCreationException(CreationException):
-    pass
-
+    def returnExitCode(self):
+        return ExitCodes.GENERIC_ERROR.value
 
 class DNSZoneCreationException(CreationException):
-    pass
-
+    def returnExitCode(self):
+        return ExitCodes.GENERIC_ERROR.value
 
 class DNSServerCreationException(CreationException):
-    pass
-
+    def returnExitCode(self):
+        return ExitCodes.GENERIC_ERROR.value
 
 class SegmentCreationException(CreationException):
-    pass
-
+    def returnExitCode(self):
+        return ExitCodes.GENERIC_ERROR.value
 
 class ArcAddOnCreationException(CreationException):
-    pass
+    def returnExitCode(self):
+        return ExitCodes.VCENTER_REGISTER_FAILURE.value
 
-
-class DeletionException(Exception):
-    pass
-
+class DeletionException(CustomBaseException):
+    def returnExitCode(self):
+        return ExitCodes.DELETION_ERROR.value
 
 class ArcAddOnDeletionException(DeletionException):
-    pass
+    def returnExitCode(self):
+        return ExitCodes.VCENTER_DEREGISTER_FAILURE.value

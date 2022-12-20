@@ -1,32 +1,103 @@
 #!/usr/bin/python
 
 # These are the exceptions used across different modules.
+from common_exceptions import CustomBaseException, ExitCodes
 
-class FilePathNotFoundInArgs(Exception): pass
+class FilePathNotFoundInArgs(CustomBaseException): 
+    def returnExitCode(self):
+        return ExitCodes.CONFIG_NOT_FOUND.value
 
-class InvalidConfigError(Exception): pass
+class AzCommandError(CustomBaseException): 
+    def returnExitCode(self):
+        return ExitCodes.AZ_CMD_ERROR.value
+        
+class AzArcApplianceValidateError(AzCommandError) :
+    def returnExitCode(self):
+        return ExitCodes.ARC_APPLIANCE_VALIDATE_FAILURE.value
 
-class AzCommandError(Exception): pass
+class AzArcAppliancePrepareError(AzCommandError):
+    def returnExitCode(self):
+        return ExitCodes.ARC_APPLIANCE_PREPARE_FAILURE.value
 
-class InvalidOperation(Exception): pass
+class AzArcApplianceDeployError(AzCommandError):
+    def returnExitCode(self):
+        return ExitCodes.ARC_APPLIANCE_DEPLOY_FAILURE.value
 
-class ProgramExit(Exception): pass
+class AzArcApplianceCreateError(AzCommandError):
+    def returnExitCode(self):
+        return ExitCodes.ARC_APPLIANCE_CREATE_FAILURE.value
 
-class vCenterOperationFailed(Exception): pass
+class AzArcApplianceDeleteError(AzCommandError):
+    def returnExitCode(self):
+        return ExitCodes.ARC_APPLIANCE_DELETE_FAILURE.value
 
-class InvalidInputError(Exception): pass
+class K8sExtnCreateError(AzCommandError):
+    def returnExitCode(self):
+        return ExitCodes.K8s_EXTN_CREATE_FAILURE.value
 
-class OperationTimedoutError(Exception): pass
+class K8sExtnDeleteError(AzCommandError):
+    def returnExitCode(self):
+        return ExitCodes.K8s_EXTN_DELETE_FAILURE.value
 
-class InvalidState(Exception): pass
+class CLCreateError(AzCommandError):
+    def returnExitCode(self):
+        return ExitCodes.CL_CREATE_FAILURE.value  
 
-class ArmFeatureNotRegistered(Exception): pass
+class CLDeleteError(AzCommandError):
+    def returnExitCode(self):
+        return ExitCodes.CL_DELETE_FAILURE.value  
 
+class VCenterCreateError(AzCommandError):
+    def returnExitCode(self):
+        return ExitCodes.VCENTER_CREATE_FAILURE.value
 
-class ClusterExtensionCreationFailed(Exception): pass
+class VCenterDeleteError(AzCommandError):
+    def returnExitCode(self):
+        return ExitCodes.VCENTER_DELETE_FAILURE.value
 
-class ArmProviderNotRegistered(Exception): pass
+class InvalidOperation(CustomBaseException): 
+    def returnExitCode(self):
+        return ExitCodes.INCORRECT_INPUT.value
 
-class InvalidRegion(Exception): pass
+class ProgramExit(CustomBaseException): 
+    def returnExitCode(self):
+        return ExitCodes.GENERIC_ERROR.value
 
-class InternetNotEnabled(Exception): pass
+class vCenterOperationFailed(CustomBaseException): 
+    def returnExitCode(self):
+        return ExitCodes.VCENTER_ENV_FAILURE.value
+
+class InvalidInputError(CustomBaseException):  
+    def returnExitCode(self):
+        return ExitCodes.INCORRECT_INPUT.value
+
+class SDDCOnboardedError(InvalidInputError):
+    def returnExitCode(self):
+        return ExitCodes.SDDC_ALREADY_ONBOARDED.value
+
+#TODO: (Remove this comment) Should we have a separate error for timeout?
+# Should we have a filter here to check for the error msg?
+class OperationTimedoutError(CustomBaseException):  
+    def returnExitCode(self):
+        return ExitCodes.ARC_APPLIANCE_CREATE_FAILURE.value 
+
+class ArmFeatureNotRegistered(CustomBaseException):  
+    def returnExitCode(self):
+        return ExitCodes.FEATURE_NOT_REGISTERED.value
+
+class ClusterExtensionCreationFailed(CustomBaseException):  
+    def returnExitCode(self):
+        return ExitCodes.K8s_EXTN_CREATE_FAILURE.value
+
+class ArmProviderNotRegistered(CustomBaseException):  
+    def returnExitCode(self):
+        return ExitCodes.RP_NOT_REGISTERED.value
+
+class InvalidRegion(CustomBaseException):  
+    def returnExitCode(self):
+        return ExitCodes.INVALID_REGION.value
+
+#TODO: Is this being used?
+class InternetNotEnabled(CustomBaseException):  
+    def returnExitCode(self):
+        return ExitCodes.INTERNET_NOT_ENABLED.value

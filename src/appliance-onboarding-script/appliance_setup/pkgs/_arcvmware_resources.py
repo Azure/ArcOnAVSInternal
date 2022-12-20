@@ -4,7 +4,7 @@ import re
 
 from pkgs._utils import safe_escape_characters
 from ._az_cli import az_cli
-from ._exceptions import AzCommandError
+from ._exceptions import AzCommandError, CLCreateError, CLDeleteError, VCenterCreateError, VCenterDeleteError
 from ._azure_resource_validations import _wait_until_appliance_is_in_running_state
 
 class ArcVMwareResources(object):
@@ -46,7 +46,7 @@ class ArcVMwareResources(object):
             '--location', f'"{location}"'
         )
         if err:
-            raise AzCommandError('Create Custom Location failed.')
+            raise CLCreateError('Create Custom Location failed.')
         logging.info("Create Custom Location succeeded")
 
         # Adding explicit get call to work around ongoing issue where
@@ -68,7 +68,7 @@ class ArcVMwareResources(object):
             '--name', f'"{name}"'
         )
         if err:
-            raise AzCommandError('Delete Custom Location failed.')
+            raise CLDeleteError('Delete Custom Location failed.')
 
         logging.info("Delete Custom Location succeeded")
 
@@ -97,7 +97,7 @@ class ArcVMwareResources(object):
             '--password="{}"'.format(safe_escape_characters(password))
         )
         if err:
-            raise AzCommandError('Connect vCenter failed.')
+            raise VCenterCreateError('Connect vCenter failed.')
         logging.info("Connect vCenter succeeded")
 
         # Adding explicit get call to work around ongoing issue where
@@ -119,7 +119,7 @@ class ArcVMwareResources(object):
             '--name', f'"{name}"',
         )
         if err:
-            raise AzCommandError('Delete vCenter failed.')
+            raise VCenterDeleteError('Delete vCenter failed.')
 
         logging.info("Delete vCenter succeeded")
         
