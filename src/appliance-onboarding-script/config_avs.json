@@ -1,10 +1,11 @@
 {
-  "subscriptionId": "",
-  "resourceGroup": "",
-  "privateCloud": "",
+  "subscriptionId": "60d6b3c7-5ae0-4491-8ea3-3caf8d7afc4c",
+  "resourceGroup": "utbanerj_pp2_sea",
+  "privateCloud": "private_cloud_pp2",
   "isStatic": true,
+  "location": "canda",
   "staticIpNetworkDetails": {
-    "networkForApplianceVM": "",
-    "networkCIDRForApplianceVM": ""
+    "networkForApplianceVM": "ao-arc-segment",
+    "networkCIDRForApplianceVM": "192.168.8.1/28"
   }
 }

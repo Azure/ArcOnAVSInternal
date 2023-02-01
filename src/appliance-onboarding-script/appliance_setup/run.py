@@ -167,11 +167,11 @@ if __name__ == "__main__":
             if Constant.LOCATION not in config:
                 config[Constant.LOCATION] = _customer_details.cloud_details[Constant.LOCATION]
 
-            # TODO: Point to documentation link here for getting valid regions.
+        if operation == 'onboard':
+             # TODO: Point to documentation link here for getting valid regions.
             if not validate_region(config[Constant.LOCATION]):
                 raise InvalidRegion(f"This feature is only available in these regions: {Constant.VALID_LOCATIONS}")
 
-        if operation == 'onboard':
             if config["register"]:
                 arc_add_on_retriever: ArcAddOnRetriever = ArcAddOnRetriever()
                 arc_add_on_details =  arc_add_on_retriever.retrieve_data(_customer_details.customer_resource)
@@ -196,6 +196,10 @@ if __name__ == "__main__":
             if config["isAVS"] and config["register"]:
                 register_with_private_cloud(_customer_details.customer_resource, vcenterId)
         elif operation == 'offboard':
+             # TODO: Point to documentation link here for getting valid regions.
+            if not validate_region(config[Constant.LOCATION]):
+                raise InvalidRegion(f"This feature is only available in these regions: {Constant.VALID_LOCATIONS}")
+
             # Removing confirm_prompts for automated testing
             if (isAutomated == False) and not confirm_prompt('Do you want to proceed with offboard operation?'):
                 raise ProgramExit('User chose to exit the program.')

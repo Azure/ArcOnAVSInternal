@@ -16,14 +16,25 @@ class CollectLogs:
 
     def fetch_onboardinglogs(self):
         try:
-            shutil.copy('config_avs.json', self.logs_folder)
-            shutil.copytree('logs', self.logs_folder + '/logs')
-            shutil.copy('.temp/vmware-appliance.yaml', self.logs_folder)
-            shutil.copy('.temp/vmware-infra.yaml', self.logs_folder)
-            shutil.copy('.temp/vmware-resource.yaml', self.logs_folder)
-            shutil.copy('.temp/kubeconfig', self.logs_folder)
-            shutil.copy('console_output.txt', self.logs_folder)
-            shutil.copy(os.path.join(self.kva_log_dir, 'kva.log'), self.logs_folder)
+            if os.path.isfile('config_avs.json'):
+                print("file found")
+                shutil.copy('config_avs.json', self.logs_folder)
+            if os.path.isfile('.temp/vmware-appliance.yaml'):
+                shutil.copy('.temp/vmware-appliance.yaml', self.logs_folder)
+            if os.path.isfile('.temp/vmware-infra.yaml'):
+                shutil.copy('.temp/vmware-infra.yaml', self.logs_folder)
+            if os.path.isfile('.temp/vmware-resource.yaml'):
+                shutil.copy('.temp/vmware-resource.yaml', self.logs_folder)
+            else:
+                print("file not found")
+            if os.path.isfile('.temp/kubeconfig'):    
+                shutil.copy('.temp/kubeconfig', self.logs_folder)
+            if os.path.isfile('console_output.txt'):    
+                shutil.copy('console_output.txt', self.logs_folder)
+            if os.path.isfile(os.path.join(self.kva_log_dir, 'kva.log')):    
+                shutil.copy(os.path.join(self.kva_log_dir, 'kva.log'), self.logs_folder)
+            if os.path.isdir('logs'):              
+                shutil.copytree('logs', self.logs_folder + '/logs')
         
         except Exception as e:
             logging.error(e)
