@@ -15,30 +15,27 @@ class CollectLogs:
         self.kva_log_dir = "C:\ProgramData\kva"   
 
     def fetch_onboardinglogs(self):
-        try:
-            if os.path.isfile('config_avs.json'):
-                print("file found")
-                shutil.copy('config_avs.json', self.logs_folder)
-            if os.path.isfile('.temp/vmware-appliance.yaml'):
-                shutil.copy('.temp/vmware-appliance.yaml', self.logs_folder)
-            if os.path.isfile('.temp/vmware-infra.yaml'):
-                shutil.copy('.temp/vmware-infra.yaml', self.logs_folder)
-            if os.path.isfile('.temp/vmware-resource.yaml'):
-                shutil.copy('.temp/vmware-resource.yaml', self.logs_folder)
-            else:
-                print("file not found")
-            if os.path.isfile('.temp/kubeconfig'):    
-                shutil.copy('.temp/kubeconfig', self.logs_folder)
-            if os.path.isfile('console_output.txt'):    
-                shutil.copy('console_output.txt', self.logs_folder)
-            if os.path.isfile(os.path.join(self.kva_log_dir, 'kva.log')):    
-                shutil.copy(os.path.join(self.kva_log_dir, 'kva.log'), self.logs_folder)
-            if os.path.isdir('logs'):              
-                shutil.copytree('logs', self.logs_folder + '/logs')
+        files_to_upload = ['config_avs.json','debug_infra.yaml','.temp/vmware-appliance.yaml', '.temp/vmware-infra.yaml',
+        '.temp/vmware-resource.yaml', '.temp/kubeconfig', 'console_output.txt', os.path.join(self.kva_log_dir, 'kva.log')]
+        dirs_to_upload = ['logs']
+        files_not_found = []
+        dirs_not_found = []
         
-        except Exception as e:
-            logging.error(e)
-    
+        for log_file in files_to_upload:
+            if os.path.isfile(log_file):    
+                shutil.copy(log_file, self.logs_folder)
+            else:
+                files_not_found.append(log_file)
+
+        for log_dir in dirs_to_upload:
+            if os.path.isdir(log_dir):
+                shutil.copytree(log_dir, self.logs_folder + '/' + log_dir)
+            else:
+                dirs_not_found.append(log_dir)
+        
+        if len(files_not_found)!=0 or len(dirs_not_found)!=0:
+            logging.error('following files/directories not found: {},{}'.format(files_not_found,dirs_not_found))
+
     def fetch_arc_appliance_logs(self):
         arc_appliance_ip = self.__config["applianceControlPlaneIpAddress"]
         vcenter_ip = self.__config['vCenterFQDN']
