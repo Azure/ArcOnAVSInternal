@@ -43,7 +43,7 @@ class UploadLogs:
         res, err = az_cli('storage', 'container', 'create', 
                         '--name', f'"{container_name}"',
                         '--account-name', f'"{self.storage_account}"',
-                        '--public-access', 'blob',
+                        '--public-access', 'off',
                         '--auth-mode','login')
         if err:
             raise AzCommandError('failed to create container')
