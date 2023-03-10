@@ -221,7 +221,7 @@ $OperationExitCode = $LASTEXITCODE
 printOperationStatusMessage -Operation $Operation -OperationExitCode $OperationExitCode
 
 <#
-$nonOffboardExitCodes denotes the exit codes on which onboarding is not required
+$nonOffboardExitCodes denotes the exit codes on which offboarding is not required
 Success = 0
 SDDC_ALREADY_ONBOARDED = 32
 #>
