@@ -220,10 +220,18 @@ $OperationExitCode = $LASTEXITCODE
 
 printOperationStatusMessage -Operation $Operation -OperationExitCode $OperationExitCode
 
+<#
+$nonOffboardExitCodes denotes the exit codes on which offboarding is not required
+Success = 0
+SDDC_ALREADY_ONBOARDED = 32
+#>
+
+$nonOffboardExitCodes = 0, 32
+
 if($Operation -eq "onboard" -And $storageAccountName -ne "None")
 {
     #TODO: split the case for fail in arc appliance deploy and other
-    if($OperationExitCode -ne 0)
+    if($OperationExitCode -notIn $nonOffboardExitCodes)
     {
         $getArcApplianceLogs = $true
         py .\appliance_setup\run.py "collect-logs" $FilePath $LogLevel $isAutomated $storageAccountName $getArcApplianceLogs $ManagedIdentityResourceId
