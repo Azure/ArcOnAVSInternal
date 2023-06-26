@@ -70,7 +70,7 @@ class ApplianceSetup(object):
             'namespace': 'Microsoft.ExtendedLocation'
         },
         {
-            'feature': ['ArcAutomatedOnboarding', 'earlyAccess'],
+            'feature': ['ArcAutomatedOnboarding'],
             'namespace': 'Microsoft.AVS'
         }
     ]
