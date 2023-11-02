@@ -170,6 +170,11 @@ if __name__ == "__main__":
             # TODO: Point to documentation link here for getting valid regions.
             if not validate_region(config[Constant.LOCATION]):
                 raise InvalidRegion(f"This feature is only available in these regions: {Constant.VALID_LOCATIONS}")
+            
+            if config["isStatic"]:
+                dns_helper = DNSHelper()
+                dns_data = dns_helper.retrieve_dns_config(_customer_details.customer_resource, _customer_details.cloud_details)
+                config[Constant.DNS_SERVICE_IP] = [dns_data.server_details['properties']['dnsServiceIp']]
 
         if operation == 'onboard':
             if config["register"]:
@@ -178,14 +183,7 @@ if __name__ == "__main__":
                 if arc_add_on_details:
                     raise SDDCOnboardedError("Cannot Onboard. SDDC is already Arc Onboarded")
                 
-            if config["isAVS"]:
-                # TODO(P0): Validate Segment Exists, Segment GW IP matches required format, Segment is empty.
-                # TODO(P1): Move the DNS Helper out of the processor
-
-                if config["isStatic"]:
-                    dns_helper = DNSHelper()
-                    dns_data = dns_helper.retrieve_dns_config(_customer_details.customer_resource, _customer_details.cloud_details)
-                    config[Constant.DNS_SERVICE_IP] = [dns_data.server_details['properties']['dnsServiceIp']]
+            # TODO(P0): Validate Segment Exists, Segment GW IP matches required format, Segment is empty.
             arc_vmware_res = ArcVMwareResources(config)
             appliance_setup = ApplianceSetup(config, arc_vmware_res, isAutomated)
 
