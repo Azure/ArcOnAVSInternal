@@ -15,7 +15,7 @@ class CollectLogs:
         self.kva_log_dir = "C:\ProgramData\kva"   
 
     def fetch_onboardinglogs(self):
-        files_to_upload = ['config.json','debug_infra.yaml','.temp/vmware-appliance.yaml', '.temp/vmware-infra.yaml',
+        files_to_upload = ['./config.json','./arcavs-output.log','./debug_infra.yaml','.temp/vmware-appliance.yaml', '.temp/vmware-infra.yaml',
         '.temp/vmware-resource.yaml', '.temp/kubeconfig', 'console_output.txt', os.path.join(self.kva_log_dir, 'kva.log')]
         dirs_to_upload = ['logs']
         files_not_found = []
